@@ -20,6 +20,36 @@ button,input,select{font:inherit}.screen{height:100%;display:none}.screen.active
 .result{align-items:center;justify-content:center;background:#eef8ff;padding:20px;overflow:auto}.resultgrid{width:min(1100px,100%);display:grid;grid-template-columns:minmax(280px,520px) 1fr;gap:35px;align-items:center}.stripwrap{background:#fff;padding:22px;border-radius:10px;box-shadow:0 20px 80px #000}.strip{width:100%;display:block}.resultbox h1{font-size:clamp(30px,5vw,58px);margin:0 0 10px}.resultbox p{color:#aaa;line-height:1.5}.qr{background:#fff;padding:10px;border-radius:8px;width:180px;height:180px;display:block}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.actions button{border:0;border-radius:12px;padding:13px 18px;font-weight:800;cursor:pointer}.primary{background:#fff;color:#111}.dark{background:#e6f3fb;color:#123047;border:1px solid #444!important}
 @media(max-width:850px){.content{grid-template-columns:1fr}.panel{position:absolute;right:0;top:66px;bottom:0;width:min(340px,92vw);z-index:5;transform:translateX(100%);transition:.2s}.panel.open{transform:translateX(0)}.mobile{display:block!important}.resultgrid{grid-template-columns:1fr;max-width:600px}.result{align-items:flex-start}.stripwrap{max-width:420px;margin:auto}}
 .mobile{display:none}
+/* Camera-first booth layout */
+.cameraArea{position:relative;min-width:0;min-height:0}
+.preview{max-width:100%;}
+.mobileOutputControls{display:none}
+@media(max-width:850px){
+  .content{display:flex;flex-direction:column;gap:0;padding:0!important;overflow:auto}
+  .cameraArea{flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;padding:22px 16px 10px;min-height:0}
+  .preview{width:min(94vw,620px);aspect-ratio:4/3;border-radius:22px;box-shadow:0 16px 42px rgba(34,112,150,.20)}
+  .cameraControls{padding:14px 12px 12px;gap:10px;background:linear-gradient(transparent,rgba(0,0,0,.78));}
+  .cameraControls .flipCamera{min-width:92px;min-height:62px;padding:10px 12px;font-size:16px;line-height:1.05}
+  .cameraControls .captureBottom{min-width:0;flex:1;min-height:62px;padding:14px 16px;font-size:clamp(17px,4.8vw,22px);white-space:nowrap}
+  .panel{position:static!important;transform:none!important;width:100%!important;max-width:none!important;border:0;border-top:1px solid var(--lb-border);padding:14px 16px 28px;overflow:visible;background:var(--lb-surface-2);box-shadow:none}
+  .panel .field:nth-child(1),.panel .field:nth-child(2),.panel .field:nth-child(3),.panel .field:nth-child(6),.panel .hint,.panel #settingsReset,.panel #home{display:none}
+  .mobileOutputControls{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 0 6px}
+  .mobileOutputControls .optionLabel{grid-column:1/-1;font-size:13px;font-weight:800;color:var(--lb-muted);margin:0 0 -2px}
+  .mobileOutputControls button{border:1px solid var(--lb-border);background:#fff;color:var(--lb-text);border-radius:16px;min-height:58px;font-weight:900;box-shadow:0 5px 16px rgba(34,112,150,.10);cursor:pointer}
+  .mobileOutputControls button.active{background:linear-gradient(135deg,var(--lb-primary),var(--lb-primary-dark));color:#fff;border-color:transparent}
+  .panel .field:nth-child(5){margin-top:10px}
+  .panel .field:nth-child(5) label{font-weight:800;color:var(--lb-muted)}
+}
+@media(max-width:520px){
+  .cameraArea{padding:16px 10px 8px}
+  .preview{width:calc(100vw - 20px);border-radius:20px}
+  .cameraControls .flipCamera{flex:0 0 94px}
+  .cameraControls .captureBottom{font-size:18px}
+  .mobileOutputControls button{min-height:54px}
+}
+@media(min-width:851px){
+  .panel{display:block!important}
+}
 @media print{body{background:#fff}.bar,.actions,.resultbox{display:none!important}.result{padding:0;display:flex!important}.resultgrid{display:block;width:100%}.stripwrap{box-shadow:none;margin:0 auto;padding:0;width:100%;max-width:500px}.strip{width:100%}}
 </style>
 <style>
@@ -249,6 +279,11 @@ body{
    </div>
   </div>
   <aside class="panel" id="panel">
+   <div class="mobileOutputControls">
+    <div class="optionLabel">Choose photo layout</div>
+    <button type="button" class="outputChoice active" data-output="template">🖼️ Template</button>
+    <button type="button" class="outputChoice" data-output="strip">🎞️ Photostrip</button>
+   </div>
    <div class="field"><label>Camera</label><select class="select" id="camera"></select></div>
    <div class="field"><label>Event / client name</label><input class="input" id="eventName" value="Your Event Name"></div>
    <div class="field"><label>Brand / booth name</label><input class="input" id="brandName" value="PHOTOBOOTH"></div>
@@ -416,6 +451,12 @@ function apply(){
 }
 $('eventName').oninput=apply;$('brandName').oninput=apply;
 apply();
+
+// Mobile-friendly output layout buttons
+document.querySelectorAll('.outputChoice').forEach(btn=>btn.addEventListener('click',()=>{
+  $('outputMode').value=btn.dataset.output;
+  document.querySelectorAll('.outputChoice').forEach(b=>b.classList.toggle('active',b===btn));
+}));
 </script>
 
 
