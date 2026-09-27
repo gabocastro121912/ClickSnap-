@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<title>clicksnap!</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Inter,system-ui,Arial,sans-serif;background:#eef8ff;color:#123047;overflow:hidden}
+button,input,select{font:inherit}.screen{height:100%;display:none}.screen.active{display:flex}
+.start{align-items:center;justify-content:center;text-align:center;padding:30px;background:radial-gradient(circle at 50% 35%,#292929,#080808 60%)}
+.startbox{max-width:720px;width:100%}.logo{font-size:clamp(44px,9vw,92px);font-weight:900;letter-spacing:-4px}.event{font-size:clamp(18px,3vw,30px);color:#bbb;margin:8px 0 35px}.startbtn,.bigbtn{border:0;border-radius:18px;background:#fff;color:#080808;padding:20px 42px;font-weight:900;font-size:clamp(20px,3vw,30px);cursor:pointer}.small{font-size:12px;color:#777;margin-top:22px}
+.booth{flex-direction:column;background:#eef8ff}.bar{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#f7fbff;border-bottom:1px solid #292929}.barbrand{font-size:20px;font-weight:900}.status{font-size:13px;color:#aaa}.content{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:0}.cameraArea{display:flex;align-items:center;justify-content:center;padding:20px}.preview{position:relative;width:min(100%,1000px);aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#ffffff;box-shadow:0 20px 70px #000}.preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.count{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:min(22vw,190px);font-weight:1000;text-shadow:0 8px 30px #000;background:#ffffff2}.flash{position:absolute;inset:0;opacity:0;background:#fff}.flash.go{animation:fl .3s}@keyframes fl{0%{opacity:.95}100%{opacity:0}}
+.panel{background:#f7fbff;border-left:1px solid #292929;padding:18px;overflow:auto}.field{margin-bottom:14px}.field label{display:block;color:#aaa;font-size:12px;margin-bottom:6px}.input,.select{width:100%;padding:12px;border-radius:10px;border:1px solid #353535;background:#e6f3fb;color:#123047}.row{display:flex;gap:8px}.row>*{flex:1}.panel button{cursor:pointer}.capture{width:100%;padding:18px;border:0;border-radius:14px;background:#fff;color:#111;font-size:21px;font-weight:900;margin:6px 0 14px}.secondary{padding:11px;border:1px solid #3a3a3a;background:#232323;color:#123047;border-radius:10px}.hint{font-size:11px;line-height:1.45;color:#777;margin-top:14px}
+.result{align-items:center;justify-content:center;background:#eef8ff;padding:20px;overflow:auto}.resultgrid{width:min(1100px,100%);display:grid;grid-template-columns:minmax(280px,520px) 1fr;gap:35px;align-items:center}.stripwrap{background:#fff;padding:22px;border-radius:10px;box-shadow:0 20px 80px #000}.strip{width:100%;display:block}.resultbox h1{font-size:clamp(30px,5vw,58px);margin:0 0 10px}.resultbox p{color:#aaa;line-height:1.5}.qr{background:#fff;padding:10px;border-radius:8px;width:180px;height:180px;display:block}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.actions button{border:0;border-radius:12px;padding:13px 18px;font-weight:800;cursor:pointer}.primary{background:#fff;color:#111}.dark{background:#e6f3fb;color:#123047;border:1px solid #444!important}
+@media(max-width:850px){.content{grid-template-columns:1fr}.panel{position:absolute;right:0;top:66px;bottom:0;width:min(340px,92vw);z-index:5;transform:translateX(100%);transition:.2s}.panel.open{transform:translateX(0)}.mobile{display:block!important}.resultgrid{grid-template-columns:1fr;max-width:600px}.result{align-items:flex-start}.stripwrap{max-width:420px;margin:auto}}
+.mobile{display:none}
+@media print{body{background:#fff}.bar,.actions,.resultbox{display:none!important}.result{padding:0;display:flex!important}.resultgrid{display:block;width:100%}.stripwrap{box-shadow:none;margin:0 auto;padding:0;width:100%;max-width:500px}.strip{width:100%}}
+</style>
+<style>
+/* Light-blue commercial theme override */
+:root{
+  --lb-bg:#eef8ff;
+  --lb-surface:#ffffff;
+  --lb-surface-2:#f5fbff;
+  --lb-border:#cfe5f2;
+  --lb-text:#123047;
+  --lb-muted:#5d7890;
+  --lb-primary:#159bd7;
+  --lb-primary-dark:#087caf;
+  --lb-accent:#55c6ef;
+  --lb-shadow:0 8px 28px rgba(34,112,150,.12);
+}
+html,body{background:var(--lb-bg)!important;color:var(--lb-text)!important}
+button,input,select,textarea{font-family:inherit}
+button{
+  color:var(--lb-text);
+}
+header,.header,.topbar,.toolbar,.panel,.card,.modal,.dialog,.sidebar,.controls,.settings,
+section,.menu,.dropdown,.popover{
+  background-color:var(--lb-surface);
+  border-color:var(--lb-border);
+  color:var(--lb-text);
+  box-shadow:var(--lb-shadow);
+}
+input,select,textarea{
+  background:var(--lb-surface);
+  color:var(--lb-text);
+  border-color:var(--lb-border);
+}
+input::placeholder,textarea::placeholder{color:#8aa4b7}
+a{color:var(--lb-primary)}
+button.primary,.primary-btn,.btn-primary,.action-primary{
+  background:linear-gradient(135deg,var(--lb-primary),var(--lb-primary-dark));
+  color:#fff!important;
+  border-color:transparent!important;
+}
+button:hover,.btn:hover{border-color:var(--lb-accent)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#e7f4fb}
+::-webkit-scrollbar-thumb{background:#b7dceb;border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:#91cbe1}
+</style>
+<style>
+/* clickSnap! responsive + visible entrance system */
+html,body{
+  min-width:0!important;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas,svg{max-width:100%;height:auto}
+button,input,select,textarea{max-width:100%}
+
+.clicksnap-welcome{
+  position:fixed;
+  inset:0;
+  z-index:2147483647;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(18px,4vw,48px);
+  background:linear-gradient(135deg,#087caf 0%,#159bd7 48%,#55c6ef 100%);
+  color:#fff;
+  opacity:1;
+  visibility:visible;
+  transition:opacity .35s ease,visibility .35s ease;
+}
+.clicksnap-welcome.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.clicksnap-welcome-card{
+  width:min(92vw,560px);
+  padding:clamp(28px,6vw,64px);
+  text-align:center;
+  border:1px solid rgba(255,255,255,.42);
+  border-radius:clamp(20px,4vw,32px);
+  background:rgba(255,255,255,.14);
+  box-shadow:0 24px 70px rgba(0,52,78,.25);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.clicksnap-brand{
+  font-size:clamp(30px,6vw,58px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.04em;
+  color:#fff!important;
+  margin-bottom:clamp(22px,4vw,34px);
+}
+.clicksnap-welcome-title{
+  font-size:clamp(42px,9vw,82px);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.04em;
+  color:#fff!important;
+}
+.clicksnap-welcome-subtitle{
+  margin-top:clamp(14px,3vw,22px);
+  font-size:clamp(15px,2.4vw,20px);
+  line-height:1.45;
+  color:#fff!important;
+}
+.clicksnap-enter{
+  margin-top:clamp(24px,5vw,36px);
+  min-height:52px;
+  min-width:150px;
+  padding:13px 28px;
+  border:0!important;
+  border-radius:999px;
+  background:#fff!important;
+  color:#087caf!important;
+  font-size:clamp(16px,2.4vw,19px);
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+.clicksnap-enter:active{transform:translateY(1px)}
+.clicksnap-enter:focus-visible{outline:3px solid rgba(255,255,255,.9);outline-offset:4px}
+
+/* Main app should breathe on every form factor */
+body{
+  overflow-x:hidden!important;
+}
+#app,.app,.container,.main,.page,.screen{
+  width:100%;
+  max-width:100%;
+}
+@media (max-width:1100px){
+  .container,.main,.content,.app{
+    padding-left:clamp(12px,3vw,28px);
+    padding-right:clamp(12px,3vw,28px);
+  }
+}
+@media (max-width:768px){
+  .row,.grid,.toolbar,.controls,.settings-row,.form-row{
+    flex-wrap:wrap!important;
+  }
+  .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .sidebar{
+    width:100%!important;
+    max-width:none!important;
+  }
+  button{
+    min-height:44px;
+  }
+}
+@media (max-width:520px){
+  .grid{
+    grid-template-columns:1fr!important;
+  }
+  .clicksnap-welcome-card{
+    width:94vw;
+    padding:30px 22px;
+  }
+  .clicksnap-brand{font-size:34px}
+  .clicksnap-welcome-title{font-size:52px}
+  .clicksnap-welcome-subtitle{font-size:15px}
+  .clicksnap-enter{width:100%;max-width:260px}
+  .modal,.dialog,.panel,.card{
+    max-width:calc(100vw - 24px)!important;
+  }
+}
+
+/* Landscape phones / small tablets */
+@media (max-height:520px) and (orientation:landscape){
+  .clicksnap-welcome{
+    padding:12px;
+    overflow:auto;
+  }
+  .clicksnap-welcome-card{
+    padding:22px 28px;
+  }
+  .clicksnap-brand{margin-bottom:10px;font-size:30px}
+  .clicksnap-welcome-title{font-size:44px}
+  .clicksnap-welcome-subtitle{margin-top:8px}
+  .clicksnap-enter{margin-top:14px;min-height:46px}
+}
+</style>
+</head>
+
+<!-- clickSnap entrance -->
+<div id="clicksnap-welcome" class="clicksnap-welcome" role="dialog" aria-label="Welcome">
+  <div class="clicksnap-welcome-card">
+    <div class="clicksnap-brand">clicksnap!</div>
+    <div class="clicksnap-welcome-title">Welcome</div>
+    <div class="clicksnap-welcome-subtitle">Ready to capture the moment?</div>
+    <button id="clicksnap-enter" class="clicksnap-enter" type="button">Enter</button>
+  </div>
+</div>
+
+<body>
+
+<section class="screen start active" id="startScreen">
+ <div class="startbox">
+  <div class="logo" id="startLogo">clicksnap!</div>
+  <div class="event" id="startEvent">Your Event Name</div>
+  <button class="startbtn" id="begin">TAP TO START</button>
+  <div class="small">4-photo professional booth • touch screen ready</div>
+ </div>
+</section>
+
+<section class="screen booth" id="boothScreen">
+ <header class="bar">
+  <div class="barbrand" id="barBrand">clicksnap!</div>
+  <div class="status" id="status">Camera loading…</div>
+  <button class="secondary mobile" id="menu">☰</button>
+ </header>
+ <div class="content">
+  <div class="cameraArea">
+   <div class="preview">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="count" id="count"></div>
+    <div class="flash" id="flash"></div>
+   </div>
+  </div>
+  <aside class="panel" id="panel">
+   <div class="field"><label>Camera</label><select class="select" id="camera"></select></div>
+   <div class="field"><label>Event / client name</label><input class="input" id="eventName" value="Your Event Name"></div>
+   <div class="field"><label>Brand / booth name</label><input class="input" id="brandName" value="PHOTOBOOTH"></div>
+   <div class="field"><label>Template</label><select class="select" id="template">
+     <option value="classic">Classic White</option><option value="black">Luxury Black</option><option value="soft">Soft Minimal</option>
+   </select></div>
+   <div class="field"><label>Countdown</label><select class="select" id="delay"><option>3</option><option selected>5</option><option>10</option></select></div>
+   <button class="capture" id="capture" disabled>📸 TAKE 4 PHOTOS</button>
+   <div class="row"><button class="secondary" id="settingsReset">Reset Event</button><button class="secondary" id="home">Home</button></div>
+   <div class="hint"><b>Camera setup:</b> connect your USB webcam, allow camera permission, then select it above. If no camera appears, check Android USB/OTG permission.<br><br>Connect the camera before opening the app. The camera must be exposed to the tablet as a browser-compatible video input. HTTPS or localhost is recommended for camera permissions.</div>
+  </aside>
+ </div>
+</section>
+
+<section class="screen result" id="resultScreen">
+ <div class="resultgrid">
+  <div class="stripwrap"><img class="strip" id="stripPreview"></div>
+  <div class="resultbox">
+   <h1>YOUR PHOTOS ARE READY</h1>
+   <p id="resultEvent">Your Event Name</p>
+   <img class="qr" id="qr" alt="QR code">
+   <p>Scan the QR code on a phone to open the photo. On this tablet, use Download or Print.</p>
+   <div class="actions">
+    <button class="primary" id="download">⬇ DOWNLOAD</button>
+    <button class="primary" id="print">🖨 PRINT</button>
+    <button class="dark" id="again">📸 TAKE ANOTHER</button>
+    <button class="dark" id="resultHome">HOME</button>
+   </div>
+ </div>
+</div>
+</section>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+const $=id=>document.getElementById(id);
+const screens=[$('startScreen'),$('boothScreen'),$('resultScreen')];
+const video=$('video'),canvas=$('canvas'),camera=$('camera'),count=$('count'),flash=$('flash');
+let stream=null, shots=[], finalData='', lastObjectUrl='';
+
+function show(el){screens.forEach(s=>s.classList.remove('active'));el.classList.add('active')}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function cameras(){
+ if(!navigator.mediaDevices?.enumerateDevices)return;
+ const ds=await navigator.mediaDevices.enumerateDevices(), cams=ds.filter(d=>d.kind==='videoinput');
+ camera.innerHTML='';
+ cams.forEach((c,i)=>{let o=document.createElement('option');o.value=c.deviceId;o.textContent=c.label||`Camera ${i+1}`;camera.appendChild(o)});
+ if(cams.length){$('capture').disabled=false;await openCamera(cams[0].deviceId)}
+}
+async function openCamera(id){
+ try{
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  stream=await navigator.mediaDevices.getUserMedia({video:{deviceId:id?{exact:id}:undefined,width:{ideal:1920},height:{ideal:1080}},audio:false});
+  video.srcObject=stream;$('status').textContent='Camera ready';
+  await refreshList();
+ }catch(e){$('status').textContent='Camera unavailable';alert('Camera could not be opened. Check permissions and connection.')}
+}
+async function refreshList(){
+ const ds=await navigator.mediaDevices.enumerateDevices(), cams=ds.filter(d=>d.kind==='videoinput'), old=camera.value;
+ camera.innerHTML='';
+ cams.forEach((c,i)=>{let o=document.createElement('option');o.value=c.deviceId;o.textContent=c.label||`Camera ${i+1}`;camera.appendChild(o)});
+ if([...camera.options].some(o=>o.value===old))camera.value=old;
+}
+camera.onchange=()=>openCamera(camera.value);
+navigator.mediaDevices?.addEventListener?.('devicechange',refreshList);
+
+async function countdown(){
+ count.style.display='flex';const n=Number($('delay').value);
+ for(let i=n;i>0;i--){count.textContent=i;await sleep(1000)}
+ count.textContent='SMILE!';await sleep(250);take();count.style.display='none'
+}
+function take(){
+ const w=video.videoWidth||1280,h=video.videoHeight||720;canvas.width=w;canvas.height=h;
+ const c=canvas.getContext('2d');c.save();c.translate(w,0);c.scale(-1,1);c.drawImage(video,0,0,w,h);c.restore();
+ const data=canvas.toDataURL('image/jpeg',.95);shots.push(data);
+ flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');
+}
+async function captureSession(){
+ if(!stream)return;$('capture').disabled=true;shots=[];
+ for(let i=0;i<4;i++){await countdown();if(i<3)await sleep(800)}
+ finalData=await makeStrip(shots);
+ $('stripPreview').src=finalData;$('resultEvent').textContent=$('eventName').value;
+ // QR is a data URL fallback. For a real remote QR, replace this with your upload/server URL.
+ $('qr').src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(finalData);
+ show($('resultScreen'));$('capture').disabled=false;
+}
+async function makeStrip(srcs){
+ const imgs=await Promise.all(srcs.map(src=>new Promise(res=>{let im=new Image();im.onload=()=>res(im);im.src=src})));
+ const W=1200, margin=70,gap=25,H=Math.round(W*.75),footer=190;
+ const out=document.createElement('canvas');out.width=W;out.height=margin*2+H*4+gap*3+footer;
+ const c=out.getContext('2d'),t=$('template').value;
+ c.fillStyle=t==='black'?'#111':t==='soft'?'#f3f0eb':'#fff';c.fillRect(0,0,out.width,out.height);
+ for(let i=0;i<4;i++){c.drawImage(imgs[i],margin,margin+i*(H+gap),W-margin*2,H)}
+ c.fillStyle=t==='black'?'#fff':'#111';c.textAlign='center';c.font='900 42px system-ui';c.fillText($('eventName').value.toUpperCase(),W/2,out.height-105);
+ c.font='600 24px system-ui';c.fillText($('brandName').value,W/2,out.height-62);
+ return out.toDataURL('image/jpeg',.96);
+}
+$('begin').addEventListener('click', async function(e){
+  e.preventDefault();
+  show($('boothScreen'));
+  $('status').textContent='Connecting camera…';
+  // Give the browser a moment to render the booth screen before requesting permission.
+  await sleep(150);
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      $('status').textContent='Camera API unavailable';
+      $('capture').disabled=true;
+      alert('This browser/page cannot access the camera. Open the website in Chrome or another modern browser over HTTPS.');
+      return;
+    }
+    await cameras();
+  } catch (err) {
+    console.error(err);
+    $('status').textContent='Camera permission needed';
+    alert('The booth opened, but the camera could not be connected. Allow camera permission, then choose the USB camera from the Camera menu.');
+  }
+});
+$('capture').onclick=captureSession;
+$('download').onclick=()=>{let a=document.createElement('a');a.href=finalData;a.download='photobooth-strip.jpg';a.click()};
+$('print').onclick=()=>window.print();
+$('again').onclick=()=>show($('boothScreen'));
+$('resultHome').onclick=()=>show($('startScreen'));
+$('home').onclick=()=>show($('startScreen'));
+$('settingsReset').onclick=()=>{ $('eventName').value='Your Event Name';$('brandName').value='PHOTOBOOTH';apply()};
+$('menu').onclick=()=>$('panel').classList.toggle('open');
+function apply(){
+ $('startLogo').textContent=$('brandName').value;$('barBrand').textContent=$('brandName').value;$('startEvent').textContent=$('eventName').value;
+}
+$('eventName').oninput=apply;$('brandName').oninput=apply;
+apply();
+</script>
+
+
+
+
+
+
+
+<script>
+(function(){
+  let clickSnapStream = null;
+
+  async function startClickSnapCamera(){
+    const enter = document.getElementById('clicksnap-enter');
+    const welcome = document.getElementById('clicksnap-welcome');
+
+    if (enter) {
+      enter.disabled = true;
+      enter.textContent = 'Starting camera…';
+    }
+
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera access is not supported by this browser.');
+      }
+
+      // Request camera directly from the user's Enter click.
+      clickSnapStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'user' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      });
+
+      // Find the project's existing video preview.
+      let video = document.querySelector(
+        '#camera, #cameraPreview, #video, #preview video, video.camera-preview, video'
+      );
+
+      // If the project doesn't already have a video element, create one.
+      if (!video) {
+        video = document.createElement('video');
+        video.id = 'clicksnap-camera-preview';
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+
+        video.style.cssText =
+          'position:fixed;inset:0;width:100vw;height:100vh;' +
+          'object-fit:cover;background:#000;z-index:999998;';
+
+        document.body.appendChild(video);
+      }
+
+      video.autoplay = true;
+      video.playsInline = true;
+      video.muted = true;
+      video.srcObject = clickSnapStream;
+
+      try { await video.play(); } catch(e) {}
+
+      // Hide the Welcome entrance only after the camera is successfully active.
+      if (welcome) {
+        welcome.classList.add('hidden');
+        setTimeout(function(){
+          if (welcome.parentNode) welcome.parentNode.removeChild(welcome);
+        }, 400);
+      }
+
+      // Tell the existing application that the camera is ready.
+      window.clickSnapCameraStream = clickSnapStream;
+      window.clickSnapCameraVideo = video;
+
+      window.dispatchEvent(new CustomEvent('clicksnap:camera-ready', {
+        detail: { stream: clickSnapStream, video: video }
+      }));
+
+      // If the existing app has a camera/video element, make sure it uses our stream.
+      document.querySelectorAll('video').forEach(function(v){
+        if (v !== video && !v.srcObject) {
+          try {
+            v.srcObject = clickSnapStream;
+            v.autoplay = true;
+            v.playsInline = true;
+            v.muted = true;
+            v.play().catch(function(){});
+          } catch(e) {}
+        }
+      });
+
+      // Remove any previous Start-button dependency.
+      try {
+        if (typeof window.startPhotobooth === 'function') window.startPhotobooth();
+      } catch(e) {}
+
+      try {
+        if (typeof window.startBooth === 'function') window.startBooth();
+      } catch(e) {}
+
+      if (enter) enter.textContent = 'Camera ready';
+
+    } catch (err) {
+      console.error('clickSnap camera start failed:', err);
+
+      if (enter) {
+        enter.disabled = false;
+        enter.textContent = 'Try again';
+      }
+
+      // Keep the Welcome screen visible so the user can retry.
+      const msg = document.querySelector('.clicksnap-camera-error');
+      if (msg) {
+        msg.textContent =
+          err.name === 'NotAllowedError'
+            ? 'Camera permission was blocked. Please allow camera access and try again.'
+            : 'Could not start the camera. Please try again.';
+      } else if (enter) {
+        const error = document.createElement('div');
+        error.className = 'clicksnap-camera-error';
+        error.textContent =
+          err.name === 'NotAllowedError'
+            ? 'Camera permission was blocked. Please allow camera access and try again.'
+            : 'Could not start the camera. Please try again.';
+        error.style.cssText =
+          'color:#fff;margin-top:14px;font-size:14px;line-height:1.4;';
+        enter.parentNode.appendChild(error);
+      }
+    }
+  }
+
+  function initClickSnapCamera(){
+    const enter = document.getElementById('clicksnap-enter');
+    if (!enter) return;
+
+    // Replace previous Enter handlers by cloning the button.
+    const cleanEnter = enter.cloneNode(true);
+    enter.parentNode.replaceChild(cleanEnter, enter);
+
+    cleanEnter.addEventListener('click', startClickSnapCamera);
+    cleanEnter.addEventListener('touchend', function(e){
+      e.preventDefault();
+      startClickSnapCamera();
+    }, {passive:false});
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initClickSnapCamera);
+  } else {
+    initClickSnapCamera();
+  }
+
+  // Clean up camera when leaving the page.
+  window.addEventListener('beforeunload', function(){
+    if(clickSnapStream){
+      clickSnapStream.getTracks().forEach(function(track){ track.stop(); });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
